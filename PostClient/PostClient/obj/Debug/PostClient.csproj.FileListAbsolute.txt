@@ -1,0 +1,10 @@
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\bin\Debug\PostClient.exe.config
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\bin\Debug\PostClient.exe
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\bin\Debug\PostClient.pdb
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.csprojAssemblyReference.cache
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.Form1.resources
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.Properties.Resources.resources
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.csproj.GenerateResource.cache
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.csproj.CoreCompileInputs.cache
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.exe
+C:\Users\Korzhov Ivan\source\repos\PostClient\PostClient\obj\Debug\PostClient.pdb
