@@ -70,7 +70,7 @@ namespace PostClient
                 IsBackground = true
             };
             searchThread.Start(comboBox_Indexes.SelectedItem.ToString());
-            MessageBox.Show(comboBox_Indexes.SelectedItem.ToString());
+            
         }
 
         private void Search(object index)

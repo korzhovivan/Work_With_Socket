@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Data.Linq;
 using System.Data.SqlClient;
 using System.Configuration;
+using Server.Properties;
 
 namespace Server
 {
@@ -26,6 +27,8 @@ namespace Server
         static IPEndPoint client_endPoint = null;
         static Socket client_socket = null;
 
+        
+
         static void Main(string[] args)
         {
             //Thread for recieve data
@@ -35,7 +38,7 @@ namespace Server
 
             SQL_conection = new SqlConnection();
             SQL_conection.ConnectionString = ConfigurationManager.ConnectionStrings["ConnectionString"].ConnectionString;
-
+            dataContext = new DataContext(SQL_conection);
             Console.ReadKey();
         }
 
@@ -48,16 +51,27 @@ namespace Server
 
             try
             {
-                
+                int recievedIndex_Int;
+                string recievedIndex_String;
+
                 try
                 {
                     byte[] bytes = new byte[1024];
                     int l = 0;
-                    do
-                    {
+                    
                         l = client_socket.Receive(bytes);
-                        Console.WriteLine(Encoding.UTF8.GetString(bytes, 0, l));
-                    } while (l > 0);
+                        recievedIndex_String = Encoding.UTF8.GetString(bytes, 0, l);
+                        recievedIndex_Int = Convert.ToInt32(recievedIndex_String);
+
+                    var select = (from index in dataContext.GetTable<Index>()
+                                  where index.Code == recievedIndex_Int
+                                  select index).ToList<Index>(); //select streets
+                    
+                    foreach (var item in select)
+                    {
+                        Console.WriteLine(item.Street);
+                    }
+                   
                 }
                 catch (SocketException ex)
                 {
