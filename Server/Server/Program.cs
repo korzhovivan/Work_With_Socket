@@ -27,7 +27,10 @@ namespace Server
         static IPEndPoint client_endPoint = null;
         static Socket client_socket = null;
 
-        
+        static IPAddress server_ip = null;
+        static IPEndPoint server_endPoint = null;
+        static Socket server_socket = null;
+
 
         static void Main(string[] args)
         {
@@ -71,13 +74,56 @@ namespace Server
                     {
                         Console.WriteLine(item.Street);
                     }
-                   
+
+                    Thread searchThread = new Thread(new ParameterizedThreadStart(SendStreets))
+                    {
+                        IsBackground = true
+                    };
+                    searchThread.Start(select);
+
                 }
                 catch (SocketException ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
                 
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void SendStreets(object obj)
+        {
+            Socket ns = null;
+
+            server_ip = IPAddress.Parse("127.0.0.1");
+            server_endPoint = new IPEndPoint(server_ip, 1025);
+            server_socket  = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            server_socket.Bind(server_endPoint);
+            
+            try
+            {
+                server_socket.Listen(20);
+                ns = server_socket.Accept();
+
+                byte[] msg = new byte[1024];
+                BinaryFormatter formatter = new BinaryFormatter();
+
+                List<Index> streets = obj as List<Index>;
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    formatter.Serialize(ms, streets);
+                    msg = ms.ToArray();
+                    ns.Send(msg);
+                    ns.Shutdown(SocketShutdown.Both);
+                    ns.Close();
+                }
+
+
+
             }
             catch (SocketException ex)
             {

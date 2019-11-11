@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Server.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,12 +23,14 @@ namespace PostClient
         IPEndPoint client_endPoint = null;
         Socket client_socket = null;
 
-        //another socket info
-        //IPAddress server_ip = null;
-        //IPEndPoint server_endPoint = null;
-        //Socket server_socket = null;
+        List<Index> streets = null;
 
-        List<string> streets = null;
+        //another socket info
+        IPAddress server_ip = null;
+        IPEndPoint server_endPoint = null;
+        Socket server_socket = null;
+
+
 
         public Form1()
         {
@@ -40,11 +43,7 @@ namespace PostClient
             client_socket.Bind(client_endPoint);
             client_socket.Listen(20);
 
-            // To recieve
-            //server_ip = IPAddress.Parse("127.0.0.1");
-            //server_endPoint = new IPEndPoint(server_ip, 1025);
-            //server_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
-            //server_socket.Connect(server_endPoint);
+            
 
             string[] indexList = new string[]
             {
@@ -57,10 +56,7 @@ namespace PostClient
             };
             comboBox_Indexes.Items.AddRange(indexList);
 
-            //Thread for recieve data
-            //Thread searchThread = new Thread(new ThreadStart(GetAnswer));
-            //searchThread.IsBackground = true;
-            //searchThread.Start();
+            
         }
         //Thread for sending data
         private void btn_search_Click(object sender, EventArgs e)
@@ -82,27 +78,45 @@ namespace PostClient
                 byte[] msg = new byte[1024];
                 
                 server_socket.Send(Encoding.UTF8.GetBytes((string)index));
-                //server_socket.Shutdown(SocketShutdown.Both);
-                //server_socket.Close();
+                
                 
             }
             catch (SocketException ex)
             {
                 MessageBox.Show(ex.Message);
             }
+            
         }
 
         private void GetAnswer()
         {
+            // To recieve
+            server_ip = IPAddress.Parse("127.0.0.1");
+            server_endPoint = new IPEndPoint(server_ip, 1025);
+            server_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            server_socket.Connect(server_endPoint);
+
             try
             {
                 byte[] bytes = new byte[1024];
+                int len;
+                do
+                {
+                    len = server_socket.Receive(bytes);
+                    Array.Resize<byte>(ref bytes, bytes.Length + 1024);
+
+                } while (server_socket.Available > 0);
 
                 BinaryFormatter formatter = new BinaryFormatter();
                 using (MemoryStream ms = new MemoryStream(bytes))
                 {
-                    streets = (List<string>)formatter.Deserialize(ms);
-                    SetStreets(streets);
+                    streets = (List<Index>)formatter.Deserialize(ms);
+                    //SetStreets(streets);
+                    foreach (Index item in streets)
+                    {
+                        MessageBox.Show(item.Street);
+                    }
+                   
                 }
 
             }
@@ -111,19 +125,26 @@ namespace PostClient
                 Console.WriteLine(ex.Message);
             }
         }
-        public void SetStreets(List<string> streets)
-        {
-            if (listView_Streets.InvokeRequired)
-            {
-                listView_Streets.Invoke(new Action<List<string>>(SetStreets), streets);
-            }
-            else
-                foreach (string item in streets)
-                {
-                    listView_Streets.Items.Add(item.ToString());
-                }
-        }
-        
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //Thread for recieve data
+            Thread searchThread = new Thread(new ThreadStart(GetAnswer));
+            searchThread.IsBackground = true;
+            searchThread.Start();
+        }
+
+        //public void SetStreets(List<Index> streets)
+        //{
+        //    if (listView_Streets.InvokeRequired)
+        //    {
+        //        listView_Streets.Invoke(new Action<List<Index>>(SetStreets), streets);
+        //    }
+        //    else
+        //        foreach (Index item in streets)
+        //        {
+        //            listView_Streets.Items.Add(item.Street);
+        //        }
+        //}
     }
 }
